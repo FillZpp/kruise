@@ -1,0 +1,46 @@
+apiVersion: ctrlmesh.kruise.io/v1alpha1
+kind: VirtualOperator
+metadata:
+  name: test-operator
+  # ...
+spec:
+  selector:
+    matchLabels:
+      component: test-operator
+  configuration:
+    controller:
+      leaderElection:
+        lockType: configmaps
+        lockID: test-operator
+    webhook:
+      certDir: /tmp/webhook-certs
+      mutatingConfigurations:
+      - test-webhook-mutating-configuration
+      validatingConfigurations:
+      - test-webhook-validating-configuration
+      port: 9443
+      serviceName: test-webhook-service
+  route:
+    globalLimits:
+    - namespaceSelector:
+        matchExpressions:
+        - key: ns-type
+          operator: NotIn
+          values:
+          - system
+    subRules:
+    - name: canary
+      match:
+      - namespaceSelector:
+          matchLabels:
+            ns-type: canary-1
+      - namespaceRegex: "^canary.*"
+  subsets:
+  - name: v2
+    labels:
+      version: v2
+    routeRules:
+    - canary
+  - name: v1
+    labels:
+      version: v1

@@ -35,4 +35,10 @@ resources:
 - group: apps
   kind: ContainerRecreateRequest
   version: v1alpha1
+- group: ctrlmesh
+  kind: VirtualOperator
+  version: v1alpha1
+- group: public
+  kind: MetaInfo
+  version: v1alpha1
 version: "2"

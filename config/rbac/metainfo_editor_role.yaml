@@ -1,0 +1,24 @@
+# permissions for end users to edit metainfoes.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: metainfo-editor-role
+rules:
+- apiGroups:
+  - public.kruise.io
+  resources:
+  - metainfos
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - public.kruise.io
+  resources:
+  - metainfos/status
+  verbs:
+  - get

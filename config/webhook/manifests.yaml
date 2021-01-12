@@ -204,6 +204,24 @@ webhooks:
     - UPDATE
     resources:
     - uniteddeployments
+- clientConfig:
+    caBundle: Cg==
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-ctrlmesh-kruise-io-v1alpha1-virtualoperator
+  failurePolicy: Fail
+  name: mvirtualoperator.kb.io
+  rules:
+  - apiGroups:
+    - ctrlmesh.kruise.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - virtualoperators
 
 ---
 apiVersion: admissionregistration.k8s.io/v1beta1
@@ -464,3 +482,21 @@ webhooks:
     - DELETE
     resources:
     - uniteddeployments
+- clientConfig:
+    caBundle: Cg==
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-ctrlmesh-kruise-io-v1alpha1-virtualoperator
+  failurePolicy: Fail
+  name: vvirtualoperator.kb.io
+  rules:
+  - apiGroups:
+    - ctrlmesh.kruise.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - virtualoperators

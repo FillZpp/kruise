@@ -24,7 +24,9 @@ import (
 
 	versioned "github.com/openkruise/kruise/pkg/client/clientset/versioned"
 	apps "github.com/openkruise/kruise/pkg/client/informers/externalversions/apps"
+	ctrlmesh "github.com/openkruise/kruise/pkg/client/informers/externalversions/ctrlmesh"
 	internalinterfaces "github.com/openkruise/kruise/pkg/client/informers/externalversions/internalinterfaces"
+	public "github.com/openkruise/kruise/pkg/client/informers/externalversions/public"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -172,8 +174,18 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Apps() apps.Interface
+	Ctrlmesh() ctrlmesh.Interface
+	Public() public.Interface
 }
 
 func (f *sharedInformerFactory) Apps() apps.Interface {
 	return apps.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Ctrlmesh() ctrlmesh.Interface {
+	return ctrlmesh.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Public() public.Interface {
+	return public.New(f, f.namespace, f.tweakListOptions)
 }

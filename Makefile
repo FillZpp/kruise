@@ -77,18 +77,18 @@ docker-multiarch:
 # find or download controller-gen
 # download controller-gen if necessary
 controller-gen:
-ifeq (, $(shell which controller-gen-kruise-2))
+ifeq (, $(shell which controller-gen-kruise-3))
 	@{ \
 	set -e ;\
 	CONTROLLER_GEN_TMP_DIR=$$(mktemp -d) ;\
 	cd $$CONTROLLER_GEN_TMP_DIR ;\
 	go mod init tmp ;\
-	echo "replace sigs.k8s.io/controller-tools => github.com/openkruise/controller-tools v0.2.9-kruise.2" >> go.mod ;\
+	echo "replace sigs.k8s.io/controller-tools => github.com/openkruise/controller-tools v0.2.9-kruise.3" >> go.mod ;\
 	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.9 ;\
 	rm -rf $$CONTROLLER_GEN_TMP_DIR ;\
-	mv $(GOBIN)/controller-gen $(GOBIN)/controller-gen-kruise-2 ;\
+	mv $(GOBIN)/controller-gen $(GOBIN)/controller-gen-kruise-3 ;\
 	}
-CONTROLLER_GEN=$(GOBIN)/controller-gen-kruise-2
+CONTROLLER_GEN=$(GOBIN)/controller-gen-kruise-3
 else
-CONTROLLER_GEN=$(shell which controller-gen-kruise-2)
+CONTROLLER_GEN=$(shell which controller-gen-kruise-3)
 endif

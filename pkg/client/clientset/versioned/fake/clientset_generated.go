@@ -23,6 +23,10 @@ import (
 	fakeappsv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/apps/v1alpha1/fake"
 	appsv1beta1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/apps/v1beta1"
 	fakeappsv1beta1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/apps/v1beta1/fake"
+	ctrlmeshv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/ctrlmesh/v1alpha1"
+	fakectrlmeshv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/ctrlmesh/v1alpha1/fake"
+	publicv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/public/v1alpha1"
+	fakepublicv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/public/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -85,4 +89,14 @@ func (c *Clientset) AppsV1alpha1() appsv1alpha1.AppsV1alpha1Interface {
 // AppsV1beta1 retrieves the AppsV1beta1Client
 func (c *Clientset) AppsV1beta1() appsv1beta1.AppsV1beta1Interface {
 	return &fakeappsv1beta1.FakeAppsV1beta1{Fake: &c.Fake}
+}
+
+// CtrlmeshV1alpha1 retrieves the CtrlmeshV1alpha1Client
+func (c *Clientset) CtrlmeshV1alpha1() ctrlmeshv1alpha1.CtrlmeshV1alpha1Interface {
+	return &fakectrlmeshv1alpha1.FakeCtrlmeshV1alpha1{Fake: &c.Fake}
+}
+
+// PublicV1alpha1 retrieves the PublicV1alpha1Client
+func (c *Clientset) PublicV1alpha1() publicv1alpha1.PublicV1alpha1Interface {
+	return &fakepublicv1alpha1.FakePublicV1alpha1{Fake: &c.Fake}
 }

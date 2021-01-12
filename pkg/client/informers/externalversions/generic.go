@@ -22,6 +22,8 @@ import (
 
 	v1alpha1 "github.com/openkruise/kruise/apis/apps/v1alpha1"
 	v1beta1 "github.com/openkruise/kruise/apis/apps/v1beta1"
+	ctrlmeshv1alpha1 "github.com/openkruise/kruise/apis/ctrlmesh/v1alpha1"
+	publicv1alpha1 "github.com/openkruise/kruise/apis/public/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -77,6 +79,14 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		// Group=apps.kruise.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithResource("statefulsets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Apps().V1beta1().StatefulSets().Informer()}, nil
+
+		// Group=ctrlmesh.kruise.io, Version=v1alpha1
+	case ctrlmeshv1alpha1.SchemeGroupVersion.WithResource("virtualoperators"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Ctrlmesh().V1alpha1().VirtualOperators().Informer()}, nil
+
+		// Group=public.kruise.io, Version=v1alpha1
+	case publicv1alpha1.SchemeGroupVersion.WithResource("metainfos"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Public().V1alpha1().MetaInfos().Informer()}, nil
 
 	}
 

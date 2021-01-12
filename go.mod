@@ -14,9 +14,11 @@ require (
 	github.com/docker/distribution v2.7.2-0.20200708230840-70e0022e42fd+incompatible
 	github.com/docker/docker v1.4.2-0.20180612054059-a9fbbdc8dd87
 	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
+	github.com/emicklei/go-restful v2.9.5+incompatible // indirect
 	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-openapi/spec v0.19.2
 	github.com/gogo/googleapis v1.4.0 // indirect
+	github.com/gogo/protobuf v1.3.1
 	github.com/gorilla/mux v1.7.3
 	github.com/onsi/ginkgo v1.12.1
 	github.com/onsi/gomega v1.10.1
@@ -29,9 +31,11 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/xyproto/simpleredis v0.0.0-20200201215242-1ff0da2967b4
 	golang.org/x/net v0.0.0-20200520004742-59133d7f0dd7
+	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
 	gomodules.xyz/jsonpatch/v2 v2.0.1
 	google.golang.org/grpc v1.23.0
+	gopkg.in/fsnotify.v1 v1.4.7
 	k8s.io/api v0.17.7
 	k8s.io/apiextensions-apiserver v0.17.7
 	k8s.io/apimachinery v0.17.7

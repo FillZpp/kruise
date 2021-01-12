@@ -1,0 +1,7 @@
+apiVersion: public.kruise.io/v1alpha1
+kind: MetaInfo
+metadata:
+  name: metainfo-sample
+spec:
+  # Add fields here
+  foo: bar

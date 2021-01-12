@@ -599,11 +599,11 @@ func AllNodesReady(c clientset.Interface, timeout time.Duration) error {
 func RestclientConfig(kubeContext string) (*clientcmdapi.Config, error) {
 	Logf(">>> kubeConfig: %s", TestContext.KubeConfig)
 	if TestContext.KubeConfig == "" {
-		return nil, fmt.Errorf("KubeConfig must be specified to load client config")
+		return nil, fmt.Errorf("Config must be specified to load client config")
 	}
 	c, err := clientcmd.LoadFromFile(TestContext.KubeConfig)
 	if err != nil {
-		return nil, fmt.Errorf("error loading KubeConfig: %v", err.Error())
+		return nil, fmt.Errorf("error loading Config: %v", err.Error())
 	}
 	if kubeContext != "" {
 		Logf(">>> kubeContext: %s", kubeContext)

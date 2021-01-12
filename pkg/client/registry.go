@@ -34,7 +34,7 @@ func GetGenericClientWithName(name string) *GenericClientset {
 	if cfg == nil {
 		return nil
 	}
-	newCfg := *cfg
+	newCfg := rest.CopyConfig(cfg)
 	newCfg.UserAgent = fmt.Sprintf("%s/%s", cfg.UserAgent, name)
-	return newForConfigOrDie(&newCfg)
+	return newForConfigOrDie(newCfg)
 }

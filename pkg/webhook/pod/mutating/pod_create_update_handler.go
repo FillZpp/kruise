@@ -61,6 +61,11 @@ func (h *PodCreateHandler) Handle(ctx context.Context, req admission.Request) ad
 		return admission.Errored(http.StatusInternalServerError, err)
 	}
 
+	err = h.virtualoperatorMutatingPod(ctx, req, obj)
+	if err != nil {
+		return admission.Errored(http.StatusBadRequest, err)
+	}
+
 	marshalled, err := json.Marshal(obj)
 	if err != nil {
 		return admission.Errored(http.StatusInternalServerError, err)

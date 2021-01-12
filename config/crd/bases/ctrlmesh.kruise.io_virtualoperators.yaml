@@ -1,0 +1,292 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.9
+  creationTimestamp: null
+  name: virtualoperators.ctrlmesh.kruise.io
+spec:
+  group: ctrlmesh.kruise.io
+  names:
+    kind: VirtualOperator
+    listKind: VirtualOperatorList
+    plural: virtualoperators
+    shortNames:
+    - vop
+    singular: virtualoperator
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: VirtualOperator is the Schema for the virtualoperators API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: VirtualOperatorSpec defines the desired state of VirtualOperator
+          properties:
+            configuration:
+              description: Configuration defines the configuration of controller and
+                webhook in this Operator.
+              properties:
+                controller:
+                  description: VirtualOperatorControllerConfiguration defines the
+                    configuration of controller in this Operator.
+                  properties:
+                    leaderElection:
+                      description: LeaderElectionConfig defines configuration of leader
+                        election
+                      properties:
+                        lockName:
+                          type: string
+                      required:
+                      - lockName
+                      type: object
+                  required:
+                  - leaderElection
+                  type: object
+                webhook:
+                  description: VirtualOperatorWebhookConfiguration defines the configuration
+                    of webhook in this Operator.
+                  properties:
+                    certDir:
+                      type: string
+                    mutatingConfigurations:
+                      items:
+                        type: string
+                      type: array
+                    port:
+                      type: integer
+                    serviceName:
+                      type: string
+                    validatingConfigurations:
+                      items:
+                        type: string
+                      type: array
+                  required:
+                  - certDir
+                  - port
+                  type: object
+              type: object
+            route:
+              description: Route defines the route of this Operator including global
+                and sub rules.
+              properties:
+                globalLimits:
+                  items:
+                    properties:
+                      namespaceRegex:
+                        type: string
+                      namespaceSelector:
+                        description: A label selector is a label query over a set
+                          of resources. The result of matchLabels and matchExpressions
+                          are ANDed. An empty label selector matches all objects.
+                          A null label selector matches no objects.
+                        properties:
+                          matchExpressions:
+                            description: matchExpressions is a list of label selector
+                              requirements. The requirements are ANDed.
+                            items:
+                              description: A label selector requirement is a selector
+                                that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: operator represents a key's relationship
+                                    to a set of values. Valid operators are In, NotIn,
+                                    Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: values is an array of string values.
+                                    If the operator is In or NotIn, the values array
+                                    must be non-empty. If the operator is Exists or
+                                    DoesNotExist, the values array must be empty.
+                                    This array is replaced during a strategic merge
+                                    patch.
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: matchLabels is a map of {key,value} pairs.
+                              A single {key,value} in the matchLabels map is equivalent
+                              to an element of matchExpressions, whose key field is
+                              "key", the operator is "In", and the values array contains
+                              only "value". The requirements are ANDed.
+                            type: object
+                        type: object
+                    type: object
+                  type: array
+                subRules:
+                  items:
+                    properties:
+                      match:
+                        items:
+                          properties:
+                            namespaceRegex:
+                              type: string
+                            namespaceSelector:
+                              description: A label selector is a label query over
+                                a set of resources. The result of matchLabels and
+                                matchExpressions are ANDed. An empty label selector
+                                matches all objects. A null label selector matches
+                                no objects.
+                              properties:
+                                matchExpressions:
+                                  description: matchExpressions is a list of label
+                                    selector requirements. The requirements are ANDed.
+                                  items:
+                                    description: A label selector requirement is a
+                                      selector that contains values, a key, and an
+                                      operator that relates the key and values.
+                                    properties:
+                                      key:
+                                        description: key is the label key that the
+                                          selector applies to.
+                                        type: string
+                                      operator:
+                                        description: operator represents a key's relationship
+                                          to a set of values. Valid operators are
+                                          In, NotIn, Exists and DoesNotExist.
+                                        type: string
+                                      values:
+                                        description: values is an array of string
+                                          values. If the operator is In or NotIn,
+                                          the values array must be non-empty. If the
+                                          operator is Exists or DoesNotExist, the
+                                          values array must be empty. This array is
+                                          replaced during a strategic merge patch.
+                                        items:
+                                          type: string
+                                        type: array
+                                    required:
+                                    - key
+                                    - operator
+                                    type: object
+                                  type: array
+                                matchLabels:
+                                  additionalProperties:
+                                    type: string
+                                  description: matchLabels is a map of {key,value}
+                                    pairs. A single {key,value} in the matchLabels
+                                    map is equivalent to an element of matchExpressions,
+                                    whose key field is "key", the operator is "In",
+                                    and the values array contains only "value". The
+                                    requirements are ANDed.
+                                  type: object
+                              type: object
+                          type: object
+                        type: array
+                      name:
+                        type: string
+                    required:
+                    - match
+                    - name
+                    type: object
+                  type: array
+              type: object
+            selector:
+              description: Selector is a label query over pods of this Operator.
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements.
+                    The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains
+                      values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies
+                          to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a
+                          set of values. Valid operators are In, NotIn, Exists and
+                          DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator
+                          is In or NotIn, the values array must be non-empty. If the
+                          operator is Exists or DoesNotExist, the values array must
+                          be empty. This array is replaced during a strategic merge
+                          patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single
+                    {key,value} in the matchLabels map is equivalent to an element
+                    of matchExpressions, whose key field is "key", the operator is
+                    "In", and the values array contains only "value". The requirements
+                    are ANDed.
+                  type: object
+              type: object
+            subsets:
+              description: Subsets defines the subsets for this Operator.
+              items:
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  name:
+                    type: string
+                  routeRules:
+                    items:
+                      type: string
+                    type: array
+                required:
+                - labels
+                - name
+                - routeRules
+                type: object
+              type: array
+          required:
+          - configuration
+          - selector
+          type: object
+        status:
+          description: VirtualOperatorStatus defines the observed state of VirtualOperator
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

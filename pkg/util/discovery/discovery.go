@@ -18,10 +18,13 @@ package discovery
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/openkruise/kruise/apis"
 	"github.com/openkruise/kruise/pkg/client"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -40,6 +43,8 @@ var (
 		Factor:   5.0,
 		Jitter:   0.1,
 	}
+
+	apiResourceCache = sync.Map{}
 )
 
 func init() {
@@ -87,4 +92,48 @@ func DiscoverObject(obj runtime.Object) bool {
 		return false
 	}
 	return DiscoverGVK(gvk)
+}
+
+func DiscoverGVR(gvr schema.GroupVersionResource) (*metav1.APIResource, error) {
+	val, ok := apiResourceCache.Load(gvr)
+	if ok {
+		return val.(*metav1.APIResource), nil
+	}
+
+	genericClient := client.GetGenericClient()
+	if genericClient == nil {
+		return nil, fmt.Errorf("no discovery client found")
+	}
+	discoveryClient := genericClient.DiscoveryClient
+
+	err := retry.OnError(backOff, func(err error) bool { return true }, func() error {
+		resourceList, err := discoveryClient.ServerResourcesForGroupVersion(gvr.GroupVersion().String())
+		if err != nil {
+			return err
+		}
+		for _, r := range resourceList.APIResources {
+			if r.Name != gvr.Resource {
+				continue
+			}
+			clone := r.DeepCopy()
+			clone.Group = gvr.Group
+			clone.Version = gvr.Version
+			apiResourceCache.Store(gvr, clone)
+			return nil
+		}
+		return errKindNotFound
+	})
+
+	if err != nil {
+		if err == errKindNotFound {
+			return nil, errors.NewNotFound(gvr.GroupResource(), "resource not found from discovery")
+		}
+
+		// This might be caused by abnormal apiserver or etcd, ignore it
+		klog.Errorf("Failed to find resources in group version %s: %v", gvr.GroupVersion().String(), err)
+		return nil, err
+	}
+
+	val, _ = apiResourceCache.Load(gvr)
+	return val.(*metav1.APIResource), nil
 }

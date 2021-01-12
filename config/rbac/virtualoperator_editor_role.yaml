@@ -1,0 +1,24 @@
+# permissions for end users to edit virtualoperators.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: virtualoperator-editor-role
+rules:
+- apiGroups:
+  - ctrlmesh.kruise.io
+  resources:
+  - virtualoperators
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ctrlmesh.kruise.io
+  resources:
+  - virtualoperators/status
+  verbs:
+  - get
