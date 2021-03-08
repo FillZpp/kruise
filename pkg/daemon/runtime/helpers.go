@@ -25,6 +25,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/docker/docker/errdefs"
+
 	dockermessage "github.com/docker/docker/pkg/jsonmessage"
 	daemonutil "github.com/openkruise/kruise/pkg/daemon/util"
 	"github.com/openkruise/kruise/pkg/util"
@@ -210,6 +212,7 @@ func (r *imagePullStatusReader) mainloop() {
 				r.seedPullStatus(ImagePullStatus{Err: err, Finish: true})
 				return
 			} else if jm.Error != nil {
+				klog.Warningf("status reader read error in jm: %v, is already exists: %v", util.DumpJSON(jm), errdefs.IsAlreadyExists(jm.Error))
 				klog.V(5).Infof("runtime read err %v", jm.Error)
 				r.seedPullStatus(ImagePullStatus{Err: fmt.Errorf("get error in pull response: %+v", jm.Error), Finish: true})
 				return

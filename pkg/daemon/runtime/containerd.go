@@ -182,9 +182,13 @@ func (d *containerdImageClient) doPullImage(ctx context.Context, ref reference.N
 		// need to update digest if fetch successfully
 		if err == nil {
 			err = d.createRepoDigestRecord(ctx, ref, img.Target(), isSchema1)
+			if err != nil {
+				klog.Warningf("containerd createRepoDigestRecord error: %v, %#v, is already exists: %v", err, err, errdefs.IsAlreadyExists(err))
+			}
 		}
 
 		if err != nil {
+			klog.Warningf("containerd pull image error: %v, %#v, is already exists: %v", err, err, errdefs.IsAlreadyExists(err))
 			stream.WriteObject(jsonstream.JSONMessage{
 				Error: &jsonstream.JSONError{
 					Code:    http.StatusInternalServerError,
