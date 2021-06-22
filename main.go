@@ -35,14 +35,18 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	extclient "github.com/openkruise/kruise/pkg/client"
+	ctrlmeshserver "github.com/openkruise/kruise/pkg/ctrlmesh/server"
 	"github.com/openkruise/kruise/pkg/features"
+	"github.com/openkruise/kruise/pkg/grpcregistry"
 	utilfeature "github.com/openkruise/kruise/pkg/util/feature"
 	"github.com/openkruise/kruise/pkg/util/fieldindex"
 	"github.com/openkruise/kruise/pkg/webhook"
 
 	appsv1alpha1 "github.com/openkruise/kruise/apis/apps/v1alpha1"
 	appsv1beta1 "github.com/openkruise/kruise/apis/apps/v1beta1"
+	ctrlmeshv1alpha1 "github.com/openkruise/kruise/apis/ctrlmesh/v1alpha1"
 	policyv1alpha1 "github.com/openkruise/kruise/apis/policy/v1alpha1"
+	publicv1alpha1 "github.com/openkruise/kruise/apis/public/v1alpha1"
 	"github.com/openkruise/kruise/pkg/controller"
 	// +kubebuilder:scaffold:imports
 )
@@ -59,10 +63,13 @@ func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = appsv1alpha1.AddToScheme(clientgoscheme.Scheme)
 	_ = appsv1beta1.AddToScheme(clientgoscheme.Scheme)
+	_ = ctrlmeshv1alpha1.AddToScheme(clientgoscheme.Scheme)
 
 	_ = appsv1alpha1.AddToScheme(scheme)
 	_ = appsv1beta1.AddToScheme(scheme)
+	_ = ctrlmeshv1alpha1.AddToScheme(scheme)
 	_ = policyv1alpha1.AddToScheme(scheme)
+	_ = publicv1alpha1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -153,6 +160,16 @@ func main() {
 	setupLog.Info("initialize webhook")
 	if err := webhook.Initialize(mgr, stopCh); err != nil {
 		setupLog.Error(err, "unable to initialize webhook")
+		os.Exit(1)
+	}
+
+	if err := grpcregistry.SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to setup gRPC registry")
+		os.Exit(1)
+	}
+
+	if err := ctrlmeshserver.SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to setup ctrlmesh server")
 		os.Exit(1)
 	}
 

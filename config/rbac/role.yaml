@@ -343,6 +343,14 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
   - nodes
   verbs:
   - get
@@ -392,3 +400,49 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ctrlmesh.kruise.io
+  resources:
+  - virtualoperators
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ctrlmesh.kruise.io
+  resources:
+  - virtualoperators/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - public.kruise.io
+  resources:
+  - metainfos
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - public.kruise.io
+  resources:
+  - metainfos/status
+  verbs:
+  - get
+  - patch
+  - update

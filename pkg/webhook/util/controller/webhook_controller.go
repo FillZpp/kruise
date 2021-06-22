@@ -113,7 +113,7 @@ func New(cfg *rest.Config, cli client.Client, handlers map[string]admission.Hand
 			secret := cur.(*v1.Secret)
 			if secret.Name == secretName {
 				klog.Infof("Secret %s updated", secretName)
-				c.queue.Add("")
+				c.queue.AddAfter("", time.Millisecond*100)
 			}
 		},
 	})
@@ -130,7 +130,7 @@ func New(cfg *rest.Config, cli client.Client, handlers map[string]admission.Hand
 			conf := cur.(*v1beta1.MutatingWebhookConfiguration)
 			if conf.Name == mutatingWebhookConfigurationName {
 				klog.Infof("MutatingWebhookConfiguration %s update", mutatingWebhookConfigurationName)
-				c.queue.Add("")
+				c.queue.AddAfter("", time.Millisecond*100)
 			}
 		},
 	})
@@ -147,7 +147,7 @@ func New(cfg *rest.Config, cli client.Client, handlers map[string]admission.Hand
 			conf := cur.(*v1beta1.ValidatingWebhookConfiguration)
 			if conf.Name == validatingWebhookConfigurationName {
 				klog.Infof("ValidatingWebhookConfiguration %s updated", validatingWebhookConfigurationName)
-				c.queue.Add("")
+				c.queue.AddAfter("", time.Millisecond*100)
 			}
 		},
 	})
@@ -166,7 +166,7 @@ func New(cfg *rest.Config, cli client.Client, handlers map[string]admission.Hand
 			crd := cur.(*apiextensionsv1beta1.CustomResourceDefinition)
 			if crd.Spec.Group == "apps.kruise.io" {
 				klog.Infof("CustomResourceDefinition %s updated", crd.Name)
-				c.queue.Add("")
+				c.queue.AddAfter("", time.Millisecond*100)
 			}
 		},
 	})

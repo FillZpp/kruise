@@ -28,6 +28,7 @@ import (
 	daemonruntime "github.com/openkruise/kruise/pkg/daemon/criruntime"
 	"github.com/openkruise/kruise/pkg/daemon/imagepuller"
 	daemonutil "github.com/openkruise/kruise/pkg/daemon/util"
+	"github.com/openkruise/kruise/pkg/util/healthz"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"k8s.io/client-go/rest"
 	"k8s.io/klog"
@@ -49,7 +50,7 @@ type daemon struct {
 	crrController    *containerrecreate.Controller
 
 	listener  net.Listener
-	healthz   *daemonutil.Healthz
+	healthz   *healthz.Healthz
 	errSignal *errSignaler
 }
 
@@ -70,7 +71,7 @@ func NewDaemon(cfg *rest.Config, bindAddress string) (Daemon, error) {
 		return nil, fmt.Errorf("new listener error: %v", err)
 	}
 
-	healthz := daemonutil.NewHealthz()
+	healthz := healthz.NewHealthz()
 
 	genericClient := client.GetGenericClient()
 	if genericClient == nil || genericClient.KubeClient == nil || genericClient.KruiseClient == nil {

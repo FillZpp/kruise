@@ -22,6 +22,8 @@ import (
 
 	appsv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/apps/v1alpha1"
 	appsv1beta1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/apps/v1beta1"
+	ctrlmeshv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/ctrlmesh/v1alpha1"
+	publicv1alpha1 "github.com/openkruise/kruise/pkg/client/clientset/versioned/typed/public/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -31,14 +33,18 @@ type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	AppsV1alpha1() appsv1alpha1.AppsV1alpha1Interface
 	AppsV1beta1() appsv1beta1.AppsV1beta1Interface
+	CtrlmeshV1alpha1() ctrlmeshv1alpha1.CtrlmeshV1alpha1Interface
+	PublicV1alpha1() publicv1alpha1.PublicV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	appsV1alpha1 *appsv1alpha1.AppsV1alpha1Client
-	appsV1beta1  *appsv1beta1.AppsV1beta1Client
+	appsV1alpha1     *appsv1alpha1.AppsV1alpha1Client
+	appsV1beta1      *appsv1beta1.AppsV1beta1Client
+	ctrlmeshV1alpha1 *ctrlmeshv1alpha1.CtrlmeshV1alpha1Client
+	publicV1alpha1   *publicv1alpha1.PublicV1alpha1Client
 }
 
 // AppsV1alpha1 retrieves the AppsV1alpha1Client
@@ -49,6 +55,16 @@ func (c *Clientset) AppsV1alpha1() appsv1alpha1.AppsV1alpha1Interface {
 // AppsV1beta1 retrieves the AppsV1beta1Client
 func (c *Clientset) AppsV1beta1() appsv1beta1.AppsV1beta1Interface {
 	return c.appsV1beta1
+}
+
+// CtrlmeshV1alpha1 retrieves the CtrlmeshV1alpha1Client
+func (c *Clientset) CtrlmeshV1alpha1() ctrlmeshv1alpha1.CtrlmeshV1alpha1Interface {
+	return c.ctrlmeshV1alpha1
+}
+
+// PublicV1alpha1 retrieves the PublicV1alpha1Client
+func (c *Clientset) PublicV1alpha1() publicv1alpha1.PublicV1alpha1Interface {
+	return c.publicV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -80,6 +96,14 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	if err != nil {
 		return nil, err
 	}
+	cs.ctrlmeshV1alpha1, err = ctrlmeshv1alpha1.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
+	cs.publicV1alpha1, err = publicv1alpha1.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
 
 	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
@@ -94,6 +118,8 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
 	cs.appsV1alpha1 = appsv1alpha1.NewForConfigOrDie(c)
 	cs.appsV1beta1 = appsv1beta1.NewForConfigOrDie(c)
+	cs.ctrlmeshV1alpha1 = ctrlmeshv1alpha1.NewForConfigOrDie(c)
+	cs.publicV1alpha1 = publicv1alpha1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -104,6 +130,8 @@ func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.appsV1alpha1 = appsv1alpha1.New(c)
 	cs.appsV1beta1 = appsv1beta1.New(c)
+	cs.ctrlmeshV1alpha1 = ctrlmeshv1alpha1.New(c)
+	cs.publicV1alpha1 = publicv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

@@ -35,6 +35,7 @@ import (
 	daemonutil "github.com/openkruise/kruise/pkg/daemon/util"
 	"github.com/openkruise/kruise/pkg/util"
 	"github.com/openkruise/kruise/pkg/util/expectations"
+	"github.com/openkruise/kruise/pkg/util/healthz"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -81,7 +82,7 @@ type Controller struct {
 }
 
 // NewController returns the controller for CRR
-func NewController(cfg *rest.Config, runtimeFactory daemonruntime.Factory, healthz *daemonutil.Healthz) (*Controller, error) {
+func NewController(cfg *rest.Config, runtimeFactory daemonruntime.Factory, healthz *healthz.Healthz) (*Controller, error) {
 	nodeName, _ := daemonutil.NodeName()
 
 	runtimeClient, err := runtimeclient.New(cfg, runtimeclient.Options{Scheme: scheme})

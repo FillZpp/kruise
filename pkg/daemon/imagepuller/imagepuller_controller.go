@@ -30,6 +30,7 @@ import (
 	listersalpha1 "github.com/openkruise/kruise/pkg/client/listers/apps/v1alpha1"
 	daemonruntime "github.com/openkruise/kruise/pkg/daemon/criruntime"
 	daemonutil "github.com/openkruise/kruise/pkg/daemon/util"
+	"github.com/openkruise/kruise/pkg/util/healthz"
 	utilimagejob "github.com/openkruise/kruise/pkg/util/imagejob"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -63,7 +64,7 @@ type Controller struct {
 }
 
 // NewController returns the controller for image pulling
-func NewController(runtimeFactory daemonruntime.Factory, secretManager daemonutil.SecretManager, healthz *daemonutil.Healthz) (*Controller, error) {
+func NewController(runtimeFactory daemonruntime.Factory, secretManager daemonutil.SecretManager, healthz *healthz.Healthz) (*Controller, error) {
 	nodeName, _ := daemonutil.NodeName()
 	genericClient := client.GetGenericClientWithName("kruise-daemon-imagepuller")
 	informer := newNodeImageInformer(genericClient.KruiseClient, nodeName)
