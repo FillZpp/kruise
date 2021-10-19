@@ -35,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	appsv1alpha1 "github.com/openkruise/kruise/apis/apps/v1alpha1"
+	appsv1beta1 "github.com/openkruise/kruise/apis/apps/v1beta1"
 	kruisectlutil "github.com/openkruise/kruise/pkg/controller/util"
 	"github.com/openkruise/kruise/pkg/util"
 )
@@ -1607,7 +1608,8 @@ func setUp(t *testing.T) (*gomega.GomegaWithT, chan reconcile.Request, context.C
 	g := gomega.NewGomegaWithT(t)
 	// Setup the Manager and Controller.  Wrap the Controller Reconcile function so it writes each request to a
 	// channel when it is finished.
-	mgr, err := manager.New(cfg, manager.Options{MetricsBindAddress: "0"})
+	gracefulShutdownTimeout := time.Duration(0)
+	mgr, err := manager.New(cfg, manager.Options{MetricsBindAddress: "0", GracefulShutdownTimeout: &gracefulShutdownTimeout})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 	c = util.NewClientFromManager(mgr, "test-uniteddeployment-controller")
 	recFn, requests := SetupTestReconcile(newReconciler(mgr))
@@ -1674,7 +1676,7 @@ func clean(g *gomega.GomegaWithT, c client.Client) {
 		return nil
 	}, timeout, time.Second).Should(gomega.Succeed())
 
-	astsList := &appsv1alpha1.StatefulSetList{}
+	astsList := &appsv1beta1.StatefulSetList{}
 	if err := c.List(context.TODO(), astsList); err == nil {
 		for _, asts := range astsList.Items {
 			c.Delete(context.TODO(), &asts)

@@ -219,7 +219,7 @@ func validateContainersForSidecarSet(
 		},
 	}
 
-	allErrs = append(allErrs, corevalidation.ValidatePodCreate(fakePod, corevalidation.PodValidationOptions{AllowMultipleHugePageResources: true, AllowDownwardAPIHugePages: true})...)
+	allErrs = append(allErrs, corevalidation.ValidatePodCreate(fakePod, corevalidation.PodValidationOptions{AllowDownwardAPIHugePages: true})...)
 
 	return allErrs
 }

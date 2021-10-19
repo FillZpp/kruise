@@ -23,12 +23,11 @@ all: build
 ##@ Development
 
 go_check:
-	@scripts/check_go_version "1.15.0"
+	@scripts/check_go_version "1.16.0"
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	@scripts/generate_client.sh
 	@scripts/generate_openapi.sh
-	@scripts/generate_bindata.sh
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./apis/..."
 
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.

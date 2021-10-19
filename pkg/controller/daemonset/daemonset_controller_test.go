@@ -118,7 +118,8 @@ func newFakePodControl() *fakePodControl {
 func (f *fakePodControl) CreatePodsOnNode(nodeName, namespace string, template *corev1.PodTemplateSpec, object runtime.Object, controllerRef *metav1.OwnerReference) error {
 	f.Lock()
 	defer f.Unlock()
-	if err := f.FakePodControl.CreatePodsOnNode(nodeName, namespace, template, object, controllerRef); err != nil {
+	template.Spec.NodeName = nodeName
+	if err := f.FakePodControl.CreatePods(namespace, template, object, controllerRef); err != nil {
 		return fmt.Errorf("failed to create pod on node %q", nodeName)
 	}
 
@@ -151,7 +152,7 @@ func (f *fakePodControl) CreatePodsOnNode(nodeName, namespace string, template *
 func (f *fakePodControl) CreatePodsWithControllerRef(namespace string, template *corev1.PodTemplateSpec, object runtime.Object, controllerRef *metav1.OwnerReference) error {
 	f.Lock()
 	defer f.Unlock()
-	if err := f.FakePodControl.CreatePodsWithControllerRef(namespace, template, object, controllerRef); err != nil {
+	if err := f.FakePodControl.CreatePods(namespace, template, object, controllerRef); err != nil {
 		return fmt.Errorf("failed to create pod for DaemonSet")
 	}
 
@@ -278,7 +279,8 @@ func TestReconcile(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	// Setup the Manager and Controller.  Wrap the Controller Reconcile function so it writes each request to a
 	// channel when it is finished.
-	mgr, err := manager.New(cfg, manager.Options{})
+	gracefulShutdownTimeout := time.Duration(0)
+	mgr, err := manager.New(cfg, manager.Options{GracefulShutdownTimeout: &gracefulShutdownTimeout})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 	c = util.NewClientFromManager(mgr, "test-daemonset-controller")
 	err = client.NewRegistry(mgr.GetConfig())

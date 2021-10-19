@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	alpha1 "github.com/openkruise/kruise/apis/apps/v1alpha1"
+	beta1 "github.com/openkruise/kruise/apis/apps/v1beta1"
 	"github.com/openkruise/kruise/pkg/util/refmanager"
 )
 
@@ -39,27 +40,27 @@ type AdvancedStatefulSetAdapter struct {
 
 // NewResourceObject creates a empty AdvancedStatefulSet object.
 func (a *AdvancedStatefulSetAdapter) NewResourceObject() client.Object {
-	return &alpha1.StatefulSet{}
+	return &beta1.StatefulSet{}
 }
 
 // NewResourceListObject creates a empty AdvancedStatefulSet object.
 func (a *AdvancedStatefulSetAdapter) NewResourceListObject() client.ObjectList {
-	return &alpha1.StatefulSetList{}
+	return &beta1.StatefulSetList{}
 }
 
 // GetObjectMeta returns the ObjectMeta of the subset of AdvancedStatefulSet.
 func (a *AdvancedStatefulSetAdapter) GetObjectMeta(obj metav1.Object) *metav1.ObjectMeta {
-	return &obj.(*alpha1.StatefulSet).ObjectMeta
+	return &obj.(*beta1.StatefulSet).ObjectMeta
 }
 
 // GetStatusObservedGeneration returns the observed generation of the subset.
 func (a *AdvancedStatefulSetAdapter) GetStatusObservedGeneration(obj metav1.Object) int64 {
-	return obj.(*alpha1.StatefulSet).Status.ObservedGeneration
+	return obj.(*beta1.StatefulSet).Status.ObservedGeneration
 }
 
 // GetReplicaDetails returns the replicas detail the subset needs.
 func (a *AdvancedStatefulSetAdapter) GetReplicaDetails(obj metav1.Object, updatedRevision string) (specReplicas, specPartition *int32, statusReplicas, statusReadyReplicas, statusUpdatedReplicas, statusUpdatedReadyReplicas int32, err error) {
-	set := obj.(*alpha1.StatefulSet)
+	set := obj.(*beta1.StatefulSet)
 	var pods []*corev1.Pod
 	pods, err = a.getStatefulSetPods(set)
 	if err != nil {
@@ -90,7 +91,7 @@ func (a *AdvancedStatefulSetAdapter) GetSubsetFailure() *string {
 
 // ConvertToResourceList converts AdvancedStatefulSetList object to AdvancedStatefulSet array.
 func (a *AdvancedStatefulSetAdapter) ConvertToResourceList(obj runtime.Object) []metav1.Object {
-	stsList := obj.(*alpha1.StatefulSetList)
+	stsList := obj.(*beta1.StatefulSetList)
 	objList := make([]metav1.Object, len(stsList.Items))
 	for i, set := range stsList.Items {
 		objList[i] = set.DeepCopy()
@@ -101,7 +102,7 @@ func (a *AdvancedStatefulSetAdapter) ConvertToResourceList(obj runtime.Object) [
 
 // ApplySubsetTemplate updates the subset to the latest revision, depending on the AdvancedStatefulSetTemplate.
 func (a *AdvancedStatefulSetAdapter) ApplySubsetTemplate(ud *alpha1.UnitedDeployment, subsetName, revision string, replicas, partition int32, obj runtime.Object) error {
-	set := obj.(*alpha1.StatefulSet)
+	set := obj.(*beta1.StatefulSet)
 
 	var subSetConfig *alpha1.Subset
 	for _, subset := range ud.Spec.Topology.Subsets {
@@ -150,9 +151,22 @@ func (a *AdvancedStatefulSetAdapter) ApplySubsetTemplate(ud *alpha1.UnitedDeploy
 	if ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.Type == appsv1.OnDeleteStatefulSetStrategyType {
 		set.Spec.UpdateStrategy.Type = appsv1.OnDeleteStatefulSetStrategyType
 	} else {
-		set.Spec.UpdateStrategy.RollingUpdate = ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate
-		if set.Spec.UpdateStrategy.RollingUpdate == nil {
-			set.Spec.UpdateStrategy.RollingUpdate = &alpha1.RollingUpdateStatefulSetStrategy{}
+		if ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate != nil {
+			set.Spec.UpdateStrategy.RollingUpdate = &beta1.RollingUpdateStatefulSetStrategy{
+				Partition:             ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.Partition,
+				MaxUnavailable:        ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.MaxUnavailable,
+				PodUpdatePolicy:       beta1.PodUpdateStrategyType(ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.PodUpdatePolicy),
+				Paused:                ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.Paused,
+				InPlaceUpdateStrategy: ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.InPlaceUpdateStrategy,
+				MinReadySeconds:       ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.MinReadySeconds,
+			}
+			if ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.UnorderedUpdate != nil {
+				set.Spec.UpdateStrategy.RollingUpdate.UnorderedUpdate = &beta1.UnorderedUpdateStrategy{
+					PriorityStrategy: ud.Spec.Template.AdvancedStatefulSetTemplate.Spec.UpdateStrategy.RollingUpdate.UnorderedUpdate.PriorityStrategy,
+				}
+			}
+		} else {
+			set.Spec.UpdateStrategy.RollingUpdate = &beta1.RollingUpdateStatefulSetStrategy{}
 		}
 		set.Spec.UpdateStrategy.RollingUpdate.Partition = &partition
 	}
@@ -186,7 +200,7 @@ func (a *AdvancedStatefulSetAdapter) IsExpected(obj metav1.Object, revision stri
 	return obj.GetLabels()[alpha1.ControllerRevisionHashLabelKey] != revision
 }
 
-func (a *AdvancedStatefulSetAdapter) getStatefulSetPods(set *alpha1.StatefulSet) ([]*corev1.Pod, error) {
+func (a *AdvancedStatefulSetAdapter) getStatefulSetPods(set *beta1.StatefulSet) ([]*corev1.Pod, error) {
 	selector, err := metav1.LabelSelectorAsSelector(set.Spec.Selector)
 	if err != nil {
 		return nil, err

@@ -31,6 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	appsv1alpha1 "github.com/openkruise/kruise/apis/apps/v1alpha1"
+	appsv1beta1 "github.com/openkruise/kruise/apis/apps/v1beta1"
 )
 
 func TestAstsReconcile(t *testing.T) {
@@ -1501,8 +1502,8 @@ func TestAstsSubsetCount(t *testing.T) {
 	g.Expect(setsubB.Spec.Template.Spec.Containers[0].Image).Should(gomega.BeEquivalentTo("nginx:5.0"))
 }
 
-func expectedAstsCount(g *gomega.GomegaWithT, ud *appsv1alpha1.UnitedDeployment, count int) *appsv1alpha1.StatefulSetList {
-	stsList := &appsv1alpha1.StatefulSetList{}
+func expectedAstsCount(g *gomega.GomegaWithT, ud *appsv1alpha1.UnitedDeployment, count int) *appsv1beta1.StatefulSetList {
+	stsList := &appsv1beta1.StatefulSetList{}
 
 	selector, err := metav1.LabelSelectorAsSelector(ud.Spec.Selector)
 	g.Expect(err).Should(gomega.BeNil())
@@ -1522,7 +1523,7 @@ func expectedAstsCount(g *gomega.GomegaWithT, ud *appsv1alpha1.UnitedDeployment,
 	return stsList
 }
 
-func getSubsetAstsByName(stsList *appsv1alpha1.StatefulSetList, name string) *appsv1alpha1.StatefulSet {
+func getSubsetAstsByName(stsList *appsv1beta1.StatefulSetList, name string) *appsv1beta1.StatefulSet {
 	for _, sts := range stsList.Items {
 		if sts.Labels[appsv1alpha1.SubSetNameLabelKey] == name {
 			return &sts

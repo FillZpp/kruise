@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - release-*
+      - test-controller-runtime-pr-1695 # Just for test
   pull_request: {}
   workflow_dispatch: {}
 

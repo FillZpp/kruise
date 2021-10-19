@@ -18,6 +18,7 @@ package uniteddeployment
 
 import (
 	"testing"
+	"time"
 
 	"github.com/onsi/gomega"
 	appsv1alpha1 "github.com/openkruise/kruise/apis/apps/v1alpha1"
@@ -97,7 +98,8 @@ func TestReconcile(t *testing.T) {
 
 	// Setup the Manager and Controller.  Wrap the Controller Reconcile function so it writes each request to a
 	// channel when it is finished.
-	mgr, err := manager.New(cfg, manager.Options{})
+	gracefulShutdownTimeout := time.Duration(0)
+	mgr, err := manager.New(cfg, manager.Options{GracefulShutdownTimeout: &gracefulShutdownTimeout})
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 	c = util.NewClientFromManager(mgr, "test-uniteddeployment-controller")
 

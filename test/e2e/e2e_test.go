@@ -32,7 +32,7 @@ import (
 
 	kruiseapis "github.com/openkruise/kruise/apis"
 	"github.com/openkruise/kruise/test/e2e/framework"
-	"github.com/openkruise/kruise/test/e2e/generated"
+	e2etestingmanifests "github.com/openkruise/kruise/test/e2e/testing-manifests"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/klog/v2"
 	"k8s.io/kubernetes/test/e2e/framework/testfiles"
@@ -56,10 +56,7 @@ func TestMain(m *testing.M) {
 	framework.AfterReadingAllFlags(&framework.TestContext)
 
 	// Enable bindata file lookup as fallback.
-	testfiles.AddFileSource(testfiles.BindataFileSource{
-		Asset:      generated.Asset,
-		AssetNames: generated.AssetNames,
-	})
+	testfiles.AddFileSource(e2etestingmanifests.GetE2ETestingManifestsFS())
 
 	// TODO: Deprecating repo-root over time... instead just use gobindata_util.go , see #23987.
 	// Right now it is still needed, for example by

@@ -131,11 +131,17 @@ func (dsc *ReconcileDaemonSet) standardRollingUpdate(ds *appsv1alpha1.DaemonSet,
 	if err != nil {
 		return fmt.Errorf("couldn't get unavailable numbers: %v", err)
 	}
+	now := dsc.failedPodsBackoff.Clock.Now()
 
 	// calculate the cluster scope numUnavailable.
 	if numUnavailable >= maxUnavailable {
 		_, oldPods := dsc.getAllDaemonSetPods(ds, nodeToDaemonPods, hash)
-		_, oldUnavailablePods := util.SplitByAvailablePods(ds.Spec.MinReadySeconds, oldPods)
+		var oldUnavailablePods []*corev1.Pod
+		for _, pod := range oldPods {
+			if !podutil.IsPodAvailable(pod, ds.Spec.MinReadySeconds, metav1.Time{Time: now}) {
+				oldUnavailablePods = append(oldUnavailablePods, pod)
+			}
+		}
 
 		// for oldPods delete all not running pods
 		var oldPodsToDelete []string
@@ -156,7 +162,14 @@ func (dsc *ReconcileDaemonSet) standardRollingUpdate(ds *appsv1alpha1.DaemonSet,
 
 	_, oldPods := dsc.getAllDaemonSetPods(ds, nodeToDaemonPods, hash)
 
-	oldAvailablePods, oldUnavailablePods := util.SplitByAvailablePods(ds.Spec.MinReadySeconds, oldPods)
+	var oldAvailablePods, oldUnavailablePods []*corev1.Pod
+	for _, pod := range oldPods {
+		if !podutil.IsPodAvailable(pod, ds.Spec.MinReadySeconds, metav1.Time{Time: now}) {
+			oldUnavailablePods = append(oldUnavailablePods, pod)
+		} else {
+			oldAvailablePods = append(oldAvailablePods, pod)
+		}
+	}
 
 	// for oldPods delete all not running pods
 	var oldPodsToDelete []string
