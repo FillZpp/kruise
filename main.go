@@ -24,7 +24,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/openkruise/kruise/pkg/util/controllerfinder"
 	"github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,7 +38,9 @@ import (
 
 	extclient "github.com/openkruise/kruise/pkg/client"
 	"github.com/openkruise/kruise/pkg/features"
+	"github.com/openkruise/kruise/pkg/runnalble"
 	utilclient "github.com/openkruise/kruise/pkg/util/client"
+	"github.com/openkruise/kruise/pkg/util/controllerfinder"
 	utilfeature "github.com/openkruise/kruise/pkg/util/feature"
 	"github.com/openkruise/kruise/pkg/util/fieldindex"
 	"github.com/openkruise/kruise/pkg/webhook"
@@ -159,6 +160,12 @@ func main() {
 	setupLog.Info("register field index")
 	if err := fieldindex.RegisterFieldIndexes(mgr.GetCache()); err != nil {
 		setupLog.Error(err, "failed to register field index")
+		os.Exit(1)
+	}
+
+	setupLog.Info("setup init runnable")
+	if err = runnalble.SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to setup init runnable")
 		os.Exit(1)
 	}
 
