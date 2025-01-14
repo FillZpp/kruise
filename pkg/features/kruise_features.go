@@ -128,6 +128,10 @@ const (
 
 	// Use certs generated externally
 	EnableExternalCerts featuregate.Feature = "EnableExternalCerts"
+
+	// CloneSetPVCReuseDuringUpdate enables CloneSet to reuse PVC during update, and it also depends on
+	// the spec.scaleStrategy.disablePVCReuse not to be true.
+	CloneSetPVCReuseDuringUpdate featuregate.Feature = "CloneSetPVCReuseDuringUpdate"
 )
 
 var defaultFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
@@ -162,6 +166,8 @@ var defaultFeatureGates = map[featuregate.Feature]featuregate.FeatureSpec{
 	StatefulSetStartOrdinal:                {Default: false, PreRelease: featuregate.Alpha},
 	PodIndexLabel:                          {Default: true, PreRelease: featuregate.Beta},
 	EnableExternalCerts:                    {Default: false, PreRelease: featuregate.Alpha},
+
+	CloneSetPVCReuseDuringUpdate: {Default: false, PreRelease: featuregate.Alpha},
 }
 
 func init() {
