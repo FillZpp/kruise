@@ -24,6 +24,7 @@ import (
 	"github.com/appscode/jsonpatch"
 	appspub "github.com/openkruise/kruise/apis/apps/pub"
 	appsv1alpha1 "github.com/openkruise/kruise/apis/apps/v1alpha1"
+	"github.com/openkruise/kruise/pkg/apiext"
 	clonesetutils "github.com/openkruise/kruise/pkg/controller/cloneset/utils"
 	"github.com/openkruise/kruise/pkg/util/inplaceupdate"
 	v1 "k8s.io/api/core/v1"
@@ -101,6 +102,10 @@ func (c *commonControl) newVersionedPods(cs *appsv1alpha1.CloneSet, revision str
 
 		inplaceupdate.InjectReadinessGate(pod)
 		clonesetutils.UpdateStorage(cs, pod)
+
+		if cs.Labels[apiext.AnnotationCloneSetPodWithHostname] == "true" {
+			pod.Spec.Hostname = pod.Name
+		}
 
 		newPods = append(newPods, pod)
 	}
