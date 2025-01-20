@@ -118,6 +118,7 @@ func TestCreatePods(t *testing.T) {
 				ResourceVersion: "1",
 			},
 			Spec: v1.PodSpec{
+				Hostname:       "foo-id1",
 				ReadinessGates: []v1.PodReadinessGate{{ConditionType: appspub.InPlaceUpdateReady}},
 				Containers: []v1.Container{
 					{
@@ -175,6 +176,7 @@ func TestCreatePods(t *testing.T) {
 				ResourceVersion: "1",
 			},
 			Spec: v1.PodSpec{
+				Hostname:       "foo-id3",
 				ReadinessGates: []v1.PodReadinessGate{{ConditionType: appspub.InPlaceUpdateReady}},
 				Containers: []v1.Container{
 					{
@@ -233,6 +235,7 @@ func TestCreatePods(t *testing.T) {
 				ResourceVersion: "1",
 			},
 			Spec: v1.PodSpec{
+				Hostname:       "foo-id4",
 				ReadinessGates: []v1.PodReadinessGate{{ConditionType: appspub.InPlaceUpdateReady}},
 				Containers: []v1.Container{
 					{

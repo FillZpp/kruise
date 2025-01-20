@@ -101,6 +101,7 @@ func (c *commonControl) newVersionedPods(cs *appsv1alpha1.CloneSet, revision str
 
 		inplaceupdate.InjectReadinessGate(pod)
 		clonesetutils.UpdateStorage(cs, pod)
+		pod.Spec.Hostname = pod.Name
 
 		newPods = append(newPods, pod)
 	}
